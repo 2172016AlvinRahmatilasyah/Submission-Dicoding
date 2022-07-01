@@ -14,8 +14,9 @@ function addBuku() {
     const textJudul = document.getElementById("inputBookTitle").value;
     const textPenulis = document.getElementById("inputBookAuthor").value;
     const textTahun = document.getElementById("inputBookYear").value;
+    const isCompleted = document.getElementById('inputBookIsComplete').checked;
     const generatedID = generateId();
-    const bukuObject = generateBukuObject(generatedID, textJudul, textPenulis, textTahun, false);
+    const bukuObject = generateBukuObject(generatedID, textJudul, textPenulis, textTahun, isCompleted);
     buku.push(bukuObject);
     document.dispatchEvent(new Event(RENDER_EVENT));
     saveData();
@@ -39,7 +40,7 @@ const buku = [];
 const RENDER_EVENT = "render-buku"; 
 
 document.addEventListener(RENDER_EVENT, function () {
-    const uncompletedBUKUList = document.getElementById("buku");
+    const uncompletedBUKUList = document.getElementById("incompleteBookshelfList");
     uncompletedBUKUList.innerHTML = "";
     const completedBUKUList = document.getElementById("completeBookshelfList");
     completedBUKUList.innerHTML = "";
@@ -51,36 +52,42 @@ document.addEventListener(RENDER_EVENT, function () {
 });
   
 function makeBuku(bukuObject) {
+    const {id,title,author,year,isCompleted} = bukuObject;
+
     const textJudul = document.createElement("h3");
-    textJudul.innerText = bukuObject.title;
+    textJudul.innerText = title;
+    
     const textPenulis = document.createElement("p");
-    textPenulis.innerText = bukuObject.author;
+    textPenulis.innerText = author;
+
     const textTahun = document.createElement("p");
-    textTahun.innerText = bukuObject.year;
+    textTahun.innerText = year;
+
     const textContainer = document.createElement("div");
     textContainer.classList.add("inner");
     textContainer.append(textJudul, textPenulis, textTahun);
     const container = document.createElement("div");
     container.classList.add("item", "shadow");
     container.append(textContainer);
-    container.setAttribute("id", `buku-${bukuObject.id}`);
-    if (bukuObject.isCompleted) {
+    container.setAttribute("id", `buku-${id}`);
+
+    if (isCompleted) {
       const undoButton = document.createElement("button");
       undoButton.classList.add("undo-button");
       undoButton.addEventListener("click", function () {
-        undoBukuFromCompleted(bukuObject.id);
+        undoBukuFromCompleted(id);
       });
       const trashButton = document.createElement("button");
       trashButton.classList.add("trash-button");
       trashButton.addEventListener("click", function () {
-        removeBukuFromCompleted(bukuObject.id);
+        removeBukuFromCompleted(id);
       });
       container.append(undoButton, trashButton);
     } else {
       const checkButton = document.createElement("button");
       checkButton.classList.add("check-button");
       checkButton.addEventListener("click", function () {
-        addBukuToCompleted(bukuObject.id);
+        addBukuToCompleted(id);
       });
       container.append(checkButton);
     }
